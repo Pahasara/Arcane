@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Arcane.App/Arcane.App.csproj" />
+  <Project Path="Arcane.Core/Arcane.Core.csproj" />
+  <Project Path="Arcane.Tests/Arcane.Tests.csproj" />
+</Solution>
