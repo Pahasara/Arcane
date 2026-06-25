@@ -1,0 +1,155 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Arcane.App.ViewModels.Auth"
+             xmlns:conv="using:Arcane.App.Converters"
+             x:DataType="vm:UnlockViewModel"
+             x:Class="Arcane.App.Views.Auth.UnlockView"
+             Background="#0F0F14">
+
+    <UserControl.Styles>
+        <!-- Shake animation: fires when ShakeError becomes true -->
+        <Style Selector="Border.shake">
+            <Style.Animations>
+                <Animation Duration="0:0:0.4" FillMode="Forward"
+                           PlaybackDirection="Normal"
+                           IterationCount="1">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="TranslateTransform.X" Value="0" />
+                    </KeyFrame>
+                    <KeyFrame Cue="20%">
+                        <Setter Property="TranslateTransform.X" Value="-10" />
+                    </KeyFrame>
+                    <KeyFrame Cue="40%">
+                        <Setter Property="TranslateTransform.X" Value="10" />
+                    </KeyFrame>
+                    <KeyFrame Cue="60%">
+                        <Setter Property="TranslateTransform.X" Value="-8" />
+                    </KeyFrame>
+                    <KeyFrame Cue="80%">
+                        <Setter Property="TranslateTransform.X" Value="8" />
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="TranslateTransform.X" Value="0" />
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="*, Auto, *">
+        <Border Grid.Row="1"
+                Background="#1A1A24"
+                CornerRadius="16"
+                Padding="48,40"
+                Width="420"
+                HorizontalAlignment="Center"
+                BoxShadow="0 8 32 0 #40000000">
+
+            <StackPanel Spacing="0">
+
+                <!-- Logo / wordmark -->
+                <StackPanel HorizontalAlignment="Center" Spacing="8" Margin="0,0,0,32">
+                    <TextBlock Text="🔒"
+                               FontSize="40"
+                               HorizontalAlignment="Center" />
+                    <TextBlock Text="Arcane"
+                               FontSize="28"
+                               FontWeight="Bold"
+                               Foreground="#E2E2F0"
+                               HorizontalAlignment="Center"
+                               LetterSpacing="3" />
+                    <TextBlock Text="Your thoughts. Yours alone."
+                               FontSize="12"
+                               Foreground="#8888AA"
+                               HorizontalAlignment="Center" />
+                </StackPanel>
+
+                <TextBlock Text="Unlock your vault"
+                           FontSize="16"
+                           FontWeight="SemiBold"
+                           Foreground="#E2E2F0"
+                           Margin="0,0,0,20" />
+
+                <!--
+                    Password input wrapped in a Border so we can apply the shake animation.
+                    The Border gets the "shake" class when ShakeError is true,
+                    which triggers the Style animation defined above.
+                -->
+                <Border x:Name="PasswordBorder"
+                        Margin="0,0,0,8"
+                        Classes.shake="{Binding ShakeError}">
+                    <TextBlock Text="Master password"
+                               FontSize="12"
+                               Foreground="#8888AA"
+                               Margin="0,0,0,6" />
+                </Border>
+
+                <!-- Separate border wrapping just the TextBox for the shake effect -->
+                <Border Classes.shake="{Binding ShakeError}"
+                        Margin="0,0,0,20">
+                    <TextBox Text="{Binding Password, Mode=TwoWay}"
+                             PasswordChar="{Binding ShowPassword,
+                                            Converter={x:Static conv:BoolToPasswordCharConverter.Instance}}"
+                             Watermark="Enter your master password"
+                             Background="#0F0F14"
+                             Foreground="#E2E2F0"
+                             BorderBrush="#2A2A3E"
+                             CornerRadius="8"
+                             Padding="12,10">
+                        <TextBox.InnerRightContent>
+                            <Button Command="{Binding ToggleShowPasswordCommand}"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Padding="8,0"
+                                    Cursor="Hand">
+                                <TextBlock Text="👁" FontSize="14" />
+                            </Button>
+                        </TextBox.InnerRightContent>
+                    </TextBox>
+                </Border>
+
+                <!-- Error message -->
+                <TextBlock Text="{Binding ErrorMessage}"
+                           Foreground="#EF4444"
+                           FontSize="13"
+                           Margin="0,0,0,16"
+                           IsVisible="{Binding ErrorMessage,
+                                       Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+                <!-- Unlock button -->
+                <Button Command="{Binding UnlockCommand}"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        Background="#7C3AED"
+                        Foreground="#FFFFFF"
+                        CornerRadius="8"
+                        Padding="0,12"
+                        FontSize="15"
+                        FontWeight="SemiBold"
+                        Cursor="Hand"
+                        Margin="0,0,0,20">
+                    <Button.Content>
+                        <Panel>
+                            <TextBlock Text="Unlock"
+                                       IsVisible="{Binding !IsBusy}"
+                                       HorizontalAlignment="Center" />
+                            <TextBlock Text="Unlocking…"
+                                       IsVisible="{Binding IsBusy}"
+                                       HorizontalAlignment="Center" />
+                        </Panel>
+                    </Button.Content>
+                </Button>
+
+                <!-- Vault creation date hint -->
+                <TextBlock Text="{Binding VaultHint}"
+                           FontSize="12"
+                           Foreground="#8888AA"
+                           HorizontalAlignment="Center"
+                           IsVisible="{Binding VaultHint,
+                                       Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+            </StackPanel>
+        </Border>
+    </Grid>
+
+</UserControl>

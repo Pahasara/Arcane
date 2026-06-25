@@ -1,0 +1,41 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Arcane.App.ViewModels"
+             x:DataType="vm:MainShellViewModel"
+             x:Class="Arcane.App.Views.Shell.MainShellView"
+             Background="#0F0F14">
+
+    <Grid>
+        <StackPanel HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Spacing="16">
+
+            <TextBlock Text="🔓"
+                       FontSize="48"
+                       HorizontalAlignment="Center" />
+
+            <TextBlock Text="Vault unlocked"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       Foreground="#E2E2F0"
+                       HorizontalAlignment="Center" />
+
+            <TextBlock Text="Entry management coming in Phase 2."
+                       FontSize="14"
+                       Foreground="#8888AA"
+                       HorizontalAlignment="Center" />
+
+            <Button Content="Lock vault"
+                    Command="{Binding LockCommand}"
+                    HorizontalAlignment="Center"
+                    Background="#2A2A3E"
+                    Foreground="#E2E2F0"
+                    CornerRadius="8"
+                    Padding="20,10"
+                    Cursor="Hand"
+                    Margin="0,8,0,0" />
+
+        </StackPanel>
+    </Grid>
+
+</UserControl>

@@ -1,0 +1,151 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Arcane.App.ViewModels.Auth"
+             xmlns:conv="using:Arcane.App.Converters"
+             x:DataType="vm:SetupViewModel"
+             x:Class="Arcane.App.Views.Auth.SetupView"
+             Background="#0F0F14">
+
+    <!-- Full-screen centered card layout -->
+    <Grid RowDefinitions="*, Auto, *">
+        <Border Grid.Row="1"
+                Background="#1A1A24"
+                CornerRadius="16"
+                Padding="48,40"
+                Width="420"
+                HorizontalAlignment="Center"
+                BoxShadow="0 8 32 0 #40000000">
+
+            <StackPanel Spacing="0">
+
+                <!-- Logo / wordmark -->
+                <StackPanel HorizontalAlignment="Center" Spacing="8" Margin="0,0,0,32">
+                    <TextBlock Text="🔒"
+                               FontSize="40"
+                               HorizontalAlignment="Center" />
+                    <TextBlock Text="Arcane"
+                               FontSize="28"
+                               FontWeight="Bold"
+                               Foreground="#E2E2F0"
+                               HorizontalAlignment="Center"
+                               LetterSpacing="3" />
+                    <TextBlock Text="Your thoughts. Yours alone."
+                               FontSize="12"
+                               Foreground="#8888AA"
+                               HorizontalAlignment="Center" />
+                </StackPanel>
+
+                <!-- Section heading -->
+                <TextBlock Text="Create your vault"
+                           FontSize="16"
+                           FontWeight="SemiBold"
+                           Foreground="#E2E2F0"
+                           Margin="0,0,0,20" />
+
+                <!-- Password field -->
+                <TextBlock Text="Master password"
+                           FontSize="12"
+                           Foreground="#8888AA"
+                           Margin="0,0,0,6" />
+                <TextBox Text="{Binding Password, Mode=TwoWay}"
+                         PasswordChar="{Binding ShowPassword,
+                                        Converter={x:Static conv:BoolToPasswordCharConverter.Instance}}"
+                         Watermark="Choose a strong password"
+                         Background="#0F0F14"
+                         Foreground="#E2E2F0"
+                         BorderBrush="#2A2A3E"
+                         CornerRadius="8"
+                         Padding="12,10"
+                         Margin="0,0,0,4">
+                    <TextBox.InnerRightContent>
+                        <Button Command="{Binding ToggleShowPasswordCommand}"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Padding="8,0"
+                                Cursor="Hand"
+                                ToolTip.Tip="Show / hide password">
+                            <TextBlock Text="{Binding ShowPassword,
+                                              Converter={x:Static conv:BoolToPasswordCharConverter.Instance},
+                                              ConverterParameter=icon}"
+                                       FontSize="14">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0}">
+                                        <Binding Path="ShowPassword" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                            <!-- Simple eye icon via text — replace with SVG icon in Phase 8 -->
+                            <Button.Content>
+                                <TextBlock Text="👁" FontSize="14" />
+                            </Button.Content>
+                        </Button>
+                    </TextBox.InnerRightContent>
+                </TextBox>
+
+                <!-- Password strength indicator -->
+                <TextBlock Text="{Binding PasswordStrength}"
+                           FontSize="12"
+                           Margin="2,4,0,16"
+                           Foreground="{Binding PasswordStrength,
+                                        Converter={x:Static conv:StrengthToColorConverter.Instance}}"
+                           IsVisible="{Binding Password.Length,
+                                       Converter={x:Static ObjectConverters.IsNotNull}}" />
+
+                <!-- Confirm password field -->
+                <TextBlock Text="Confirm password"
+                           FontSize="12"
+                           Foreground="#8888AA"
+                           Margin="0,0,0,6" />
+                <TextBox Text="{Binding ConfirmPassword, Mode=TwoWay}"
+                         PasswordChar="{Binding ShowPassword,
+                                        Converter={x:Static conv:BoolToPasswordCharConverter.Instance}}"
+                         Watermark="Repeat your password"
+                         Background="#0F0F14"
+                         Foreground="#E2E2F0"
+                         BorderBrush="#2A2A3E"
+                         CornerRadius="8"
+                         Padding="12,10"
+                         Margin="0,0,0,20" />
+
+                <!-- Error message -->
+                <TextBlock Text="{Binding ErrorMessage}"
+                           Foreground="#EF4444"
+                           FontSize="13"
+                           TextWrapping="Wrap"
+                           Margin="0,0,0,16"
+                           IsVisible="{Binding ErrorMessage,
+                                       Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+                <!-- Create button -->
+                <Button Content="{Binding IsBusy, Converter={x:Static ObjectConverters.IsNull},
+                                  ConverterParameter='Creating vault…|Create vault'}"
+                        Command="{Binding CreateVaultCommand}"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        Background="#7C3AED"
+                        Foreground="#FFFFFF"
+                        CornerRadius="8"
+                        Padding="0,12"
+                        FontSize="15"
+                        FontWeight="SemiBold"
+                        Cursor="Hand">
+                    <Button.Content>
+                        <Panel>
+                            <TextBlock Text="Create vault"
+                                       IsVisible="{Binding !IsBusy}"
+                                       HorizontalAlignment="Center" />
+                            <StackPanel Orientation="Horizontal"
+                                        Spacing="8"
+                                        IsVisible="{Binding IsBusy}"
+                                        HorizontalAlignment="Center">
+                                <TextBlock Text="Creating vault…" />
+                            </StackPanel>
+                        </Panel>
+                    </Button.Content>
+                </Button>
+
+            </StackPanel>
+        </Border>
+    </Grid>
+
+</UserControl>
