@@ -1,10 +1,12 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="clr-namespace:Markdown.Avalonia;assembly=Markdown.Avalonia"
              xmlns:vm="using:Arcane.App.ViewModels"
              xmlns:vmAuth="using:Arcane.App.ViewModels.Auth"
-             xmlns:views="using:Arcane.App.Views"
+             xmlns:vmEntries="using:Arcane.App.ViewModels.Entries"
              xmlns:viewsAuth="using:Arcane.App.Views.Auth"
              xmlns:viewsShell="using:Arcane.App.Views.Shell"
+             xmlns:viewsEntries="using:Arcane.App.Views.Entries"
              x:Class="Arcane.App.App"
              RequestedThemeVariant="Dark">
 
@@ -12,11 +14,6 @@
         <FluentTheme />
     </Application.Styles>
 
-    <!--
-        DataTemplates: ViewModel type → View type.
-        Avalonia resolves these automatically when ContentControl.Content changes.
-        Add a new entry here every time you add a new View/ViewModel pair.
-    -->
     <Application.DataTemplates>
 
         <DataTemplate DataType="{x:Type vmAuth:SetupViewModel}">
@@ -29,6 +26,11 @@
 
         <DataTemplate DataType="{x:Type vm:MainShellViewModel}">
             <viewsShell:MainShellView />
+        </DataTemplate>
+
+        <!-- Phase 2: editor resolved by ContentControl inside MainShellView -->
+        <DataTemplate DataType="{x:Type vmEntries:EntryEditorViewModel}">
+            <viewsEntries:EntryEditorView />
         </DataTemplate>
 
     </Application.DataTemplates>

@@ -1,0 +1,35 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Arcane.App.Controls.MoodPicker">
+
+    <UserControl.Styles>
+        <Style Selector="Button.mood-btn">
+            <Setter Property="Background"                   Value="Transparent" />
+            <Setter Property="BorderThickness"              Value="2" />
+            <Setter Property="BorderBrush"                  Value="Transparent" />
+            <Setter Property="CornerRadius"                 Value="20" />
+            <Setter Property="Width"                        Value="36" />
+            <Setter Property="Height"                       Value="36" />
+            <Setter Property="Padding"                      Value="0" />
+            <Setter Property="Cursor"                       Value="Hand" />
+            <Setter Property="FontSize"                     Value="18" />
+            <Setter Property="HorizontalContentAlignment"   Value="Center" />
+            <Setter Property="VerticalContentAlignment"     Value="Center" />
+        </Style>
+        <Style Selector="Button.mood-btn:pointerover">
+            <Setter Property="Background" Value="#2A2A3E" />
+        </Style>
+        <Style Selector="Button.mood-btn.selected">
+            <Setter Property="BorderBrush" Value="#7C3AED" />
+        </Style>
+    </UserControl.Styles>
+
+    <StackPanel Orientation="Horizontal" Spacing="4">
+        <Button x:Name="BtnAwful"   Classes="mood-btn" Content="😞" ToolTip.Tip="Awful" />
+        <Button x:Name="BtnBad"     Classes="mood-btn" Content="😕" ToolTip.Tip="Bad" />
+        <Button x:Name="BtnNeutral" Classes="mood-btn" Content="😐" ToolTip.Tip="Neutral" />
+        <Button x:Name="BtnGood"    Classes="mood-btn" Content="🙂" ToolTip.Tip="Good" />
+        <Button x:Name="BtnGreat"   Classes="mood-btn" Content="😊" ToolTip.Tip="Great" />
+    </StackPanel>
+
+</UserControl>

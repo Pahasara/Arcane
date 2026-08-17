@@ -50,7 +50,7 @@
                 <TextBox Text="{Binding Password, Mode=TwoWay}"
                          PasswordChar="{Binding ShowPassword,
                                         Converter={x:Static conv:BoolToPasswordCharConverter.Instance}}"
-                         Watermark="Choose a strong password"
+                         PlaceholderText="Choose a strong password"
                          Background="#0F0F14"
                          Foreground="#E2E2F0"
                          BorderBrush="#2A2A3E"
@@ -64,20 +64,7 @@
                                 Padding="8,0"
                                 Cursor="Hand"
                                 ToolTip.Tip="Show / hide password">
-                            <TextBlock Text="{Binding ShowPassword,
-                                              Converter={x:Static conv:BoolToPasswordCharConverter.Instance},
-                                              ConverterParameter=icon}"
-                                       FontSize="14">
-                                <TextBlock.Text>
-                                    <MultiBinding StringFormat="{}{0}">
-                                        <Binding Path="ShowPassword" />
-                                    </MultiBinding>
-                                </TextBlock.Text>
-                            </TextBlock>
-                            <!-- Simple eye icon via text — replace with SVG icon in Phase 8 -->
-                            <Button.Content>
                                 <TextBlock Text="👁" FontSize="14" />
-                            </Button.Content>
                         </Button>
                     </TextBox.InnerRightContent>
                 </TextBox>
@@ -99,7 +86,7 @@
                 <TextBox Text="{Binding ConfirmPassword, Mode=TwoWay}"
                          PasswordChar="{Binding ShowPassword,
                                         Converter={x:Static conv:BoolToPasswordCharConverter.Instance}}"
-                         Watermark="Repeat your password"
+                         PlaceholderText="Repeat your password"
                          Background="#0F0F14"
                          Foreground="#E2E2F0"
                          BorderBrush="#2A2A3E"
@@ -117,9 +104,7 @@
                                        Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
 
                 <!-- Create button -->
-                <Button Content="{Binding IsBusy, Converter={x:Static ObjectConverters.IsNull},
-                                  ConverterParameter='Creating vault…|Create vault'}"
-                        Command="{Binding CreateVaultCommand}"
+                <Button Command="{Binding CreateVaultCommand}"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Center"
                         Background="#7C3AED"

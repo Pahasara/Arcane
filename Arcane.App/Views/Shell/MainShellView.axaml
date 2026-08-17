@@ -1,41 +1,94 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Arcane.App.ViewModels"
+             xmlns:viewsEntries="using:Arcane.App.Views.Entries"
              x:DataType="vm:MainShellViewModel"
              x:Class="Arcane.App.Views.Shell.MainShellView"
              Background="#0F0F14">
 
-    <Grid>
-        <StackPanel HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Spacing="16">
+    <Grid ColumnDefinitions="280,1,*">
 
-            <TextBlock Text="🔓"
-                       FontSize="48"
-                       HorizontalAlignment="Center" />
+        <!-- Column 0: Sidebar -->
+        <DockPanel Grid.Column="0" Background="#1A1A24">
 
-            <TextBlock Text="Vault unlocked"
-                       FontSize="24"
-                       FontWeight="Bold"
-                       Foreground="#E2E2F0"
-                       HorizontalAlignment="Center" />
+            <Border DockPanel.Dock="Top"
+                    BorderBrush="#2A2A3E"
+                    BorderThickness="0,0,0,1"
+                    Padding="16,12">
+                <Grid ColumnDefinitions="*,Auto,Auto">
 
-            <TextBlock Text="Entry management coming in Phase 2."
-                       FontSize="14"
-                       Foreground="#8888AA"
-                       HorizontalAlignment="Center" />
+                    <TextBlock Grid.Column="0"
+                               Text="Arcane"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               Foreground="#E2E2F0"
+                               VerticalAlignment="Center"
+                               LetterSpacing="2" />
 
-            <Button Content="Lock vault"
-                    Command="{Binding LockCommand}"
-                    HorizontalAlignment="Center"
-                    Background="#2A2A3E"
-                    Foreground="#E2E2F0"
-                    CornerRadius="8"
-                    Padding="20,10"
-                    Cursor="Hand"
-                    Margin="0,8,0,0" />
+                    <Button Grid.Column="1"
+                            Command="{Binding EntryList.NewEntryCommand}"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Padding="6"
+                            Margin="0,0,4,0"
+                            Cursor="Hand"
+                            ToolTip.Tip="New entry (Ctrl+N)">
+                        <TextBlock Text="＋"
+                                   FontSize="18"
+                                   Foreground="#7C3AED"
+                                   FontWeight="Bold" />
+                    </Button>
 
-        </StackPanel>
+                    <Button Grid.Column="2"
+                            Command="{Binding LockCommand}"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Padding="6"
+                            Cursor="Hand"
+                            ToolTip.Tip="Lock vault (Ctrl+L)">
+                        <TextBlock Text="🔒" FontSize="16" />
+                    </Button>
+
+                </Grid>
+            </Border>
+
+            <viewsEntries:EntryListView DataContext="{Binding EntryList}" />
+
+        </DockPanel>
+
+        <!-- Column 1: Divider -->
+        <Border Grid.Column="1" Background="#2A2A3E" />
+
+        <!-- Column 2: Editor panel -->
+        <Grid Grid.Column="2">
+
+            <StackPanel HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="12"
+                        IsVisible="{Binding CurrentEditor,
+                                    Converter={x:Static ObjectConverters.IsNull}}">
+                <TextBlock Text="📔"
+                           FontSize="48"
+                           HorizontalAlignment="Center" />
+                <TextBlock Text="Select an entry or create a new one"
+                           FontSize="14"
+                           Foreground="#8888AA"
+                           HorizontalAlignment="Center" />
+                <Button Content="＋ New entry"
+                        Command="{Binding EntryList.NewEntryCommand}"
+                        Background="#7C3AED"
+                        Foreground="White"
+                        CornerRadius="8"
+                        Padding="20,10"
+                        HorizontalAlignment="Center"
+                        Cursor="Hand" />
+            </StackPanel>
+
+            <ContentControl Content="{Binding CurrentEditor}"
+                            IsVisible="{Binding CurrentEditor,
+                                        Converter={x:Static ObjectConverters.IsNotNull}}" />
+
+        </Grid>
     </Grid>
 
 </UserControl>

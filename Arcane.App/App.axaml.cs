@@ -2,6 +2,7 @@ using System;
 using Arcane.App.Services;
 using Arcane.App.ViewModels;
 using Arcane.App.ViewModels.Auth;
+using Arcane.App.ViewModels.Entries;
 using Arcane.Core.Data;
 using Arcane.Core.Encryption;
 using Arcane.Core.Helpers;
@@ -64,33 +65,30 @@ public partial class App : Application
         base.OnFrameworkInitializationCompleted();
     }
 
-    private static void ConfigureServices(ServiceCollection services)
-    {
-        // --- Core infrastructure ---
+private static void ConfigureServices(ServiceCollection services)
+{
+    // --- Core infrastructure ---
+    services.AddDbContextFactory<ArcaneDbContext>(options =>
+        options.UseSqlite($"Data Source={PathHelper.DatabasePath}"));
 
-        // IDbContextFactory<ArcaneDbContext> is Singleton-safe — use this in all Singleton services
-        services.AddDbContextFactory<ArcaneDbContext>(options =>
-            options.UseSqlite($"Data Source={PathHelper.DatabasePath}"));
+    services.AddSingleton<IEncryptionService,    AesEncryptionService>();
+    services.AddSingleton<IKeyDerivationService, KeyDerivationService>();
+    services.AddSingleton<IVaultService,         VaultService>();
 
-        services.AddSingleton<IEncryptionService,    AesEncryptionService>();
-        services.AddSingleton<IKeyDerivationService, KeyDerivationService>();
-        services.AddSingleton<IVaultService,         VaultService>();
+    services.AddSingleton<IEntryService, EntryService>();
 
-        // --- App-level services ---
+    // --- App-level ---
+    services.AddSingleton<MainWindowViewModel>();
+    services.AddSingleton<INavigationService>(sp =>
+        new NavigationService(
+            sp.GetRequiredService<MainWindowViewModel>(),
+            sp));
 
-        // MainWindowViewModel is Singleton — one instance holds the active ViewModel reference
-        services.AddSingleton<MainWindowViewModel>();
-
-        // NavigationService needs MainWindowViewModel + IServiceProvider (to resolve VMs)
-        // Register as a factory so it can capture the IServiceProvider at build time
-        services.AddSingleton<INavigationService>(sp =>
-            new NavigationService(
-                sp.GetRequiredService<MainWindowViewModel>(),
-                sp));
-
-        // --- ViewModels (Transient: fresh instance on each NavigateTo call) ---
-        services.AddTransient<SetupViewModel>();
-        services.AddTransient<UnlockViewModel>();
-        services.AddTransient<MainShellViewModel>();
-    }
+    // --- ViewModels ---
+    services.AddTransient<SetupViewModel>();
+    services.AddTransient<UnlockViewModel>();
+    services.AddTransient<EntryListViewModel>();
+    services.AddTransient<EntryEditorViewModel>();
+    services.AddTransient<MainShellViewModel>();
+}
 }

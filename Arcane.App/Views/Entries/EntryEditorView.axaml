@@ -1,0 +1,125 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Arcane.App.ViewModels.Entries"
+             xmlns:controls="using:Arcane.App.Controls"
+             xmlns:conv="using:Arcane.App.Converters"
+             x:DataType="vm:EntryEditorViewModel"
+             x:Class="Arcane.App.Views.Entries.EntryEditorView"
+             Background="#0F0F14">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto">
+
+        <!-- Row 0: Title + toolbar -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="24,16,24,0">
+
+            <TextBox Grid.Column="0"
+                     Text="{Binding Title, Mode=TwoWay}"
+                     FontSize="22"
+                     FontWeight="Bold"
+                     Foreground="#E2E2F0"
+                     Background="Transparent"
+                     BorderThickness="0"
+                     Padding="0"
+                     PlaceholderText="Untitled"
+                     VerticalAlignment="Center" />
+
+            <StackPanel Grid.Column="1"
+                        Orientation="Horizontal"
+                        Spacing="8"
+                        VerticalAlignment="Center"
+                        Margin="12,0,0,0">
+
+                <TextBlock Text="{Binding SaveStatus}"
+                           FontSize="12"
+                           Foreground="#8888AA"
+                           VerticalAlignment="Center"
+                           IsVisible="{Binding SaveStatus,
+                                       Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+                <Button Command="{Binding ToggleFavoriteCommand}"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Padding="6"
+                        Cursor="Hand"
+                        ToolTip.Tip="Toggle favourite">
+                    <TextBlock Text="{Binding IsFavorite,
+                                      Converter={x:Static conv:BoolToStarConverter.Instance}}"
+                               FontSize="16" />
+                </Button>
+
+                <Button Command="{Binding RequestDeleteCommand}"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Padding="6"
+                        Cursor="Hand"
+                        ToolTip.Tip="Delete entry"
+                        IsVisible="{Binding !ShowDeleteConfirm}">
+                    <TextBlock Text="🗑" FontSize="16" />
+                </Button>
+
+            </StackPanel>
+        </Grid>
+
+        <!-- Row 1: Date + MoodPicker -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="24,8,24,8">
+
+            <TextBlock Grid.Column="0"
+                       Text="{Binding CreatedAt,
+                              StringFormat='{}{0:dddd, dd MMMM yyyy}'}"
+                       FontSize="13"
+                       Foreground="#8888AA"
+                       VerticalAlignment="Center" />
+
+            <controls:MoodPicker Grid.Column="1"
+                                 SelectedMood="{Binding SelectedMood, Mode=TwoWay}"
+                                 VerticalAlignment="Center" />
+        </Grid>
+
+        <!-- Row 2: Markdown editor -->
+        <controls:MarkdownEditor Grid.Row="2"
+                                 Text="{Binding Content, Mode=TwoWay}" />
+
+        <!-- Row 3: Error message -->
+        <TextBlock Grid.Row="3"
+                   Text="{Binding ErrorMessage}"
+                   Foreground="#EF4444"
+                   FontSize="12"
+                   Margin="24,4"
+                   IsVisible="{Binding ErrorMessage,
+                               Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+        <!-- Row 3 (overlaps): Delete confirmation banner -->
+        <Border Grid.Row="3"
+                Background="#1A1A24"
+                BorderBrush="#EF4444"
+                BorderThickness="0,1,0,0"
+                Padding="24,12"
+                IsVisible="{Binding ShowDeleteConfirm}">
+            <Grid ColumnDefinitions="*,Auto,Auto">
+                <TextBlock Grid.Column="0"
+                           Text="Delete this entry? This cannot be undone."
+                           Foreground="#E2E2F0"
+                           VerticalAlignment="Center" />
+                <Button Grid.Column="1"
+                        Content="Delete"
+                        Command="{Binding ConfirmDeleteCommand}"
+                        Background="#EF4444"
+                        Foreground="White"
+                        CornerRadius="6"
+                        Padding="16,6"
+                        Margin="0,0,8,0"
+                        Cursor="Hand" />
+                <Button Grid.Column="2"
+                        Content="Cancel"
+                        Command="{Binding CancelDeleteCommand}"
+                        Background="#2A2A3E"
+                        Foreground="#E2E2F0"
+                        CornerRadius="6"
+                        Padding="16,6"
+                        Cursor="Hand" />
+            </Grid>
+        </Border>
+
+    </Grid>
+
+</UserControl>

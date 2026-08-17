@@ -1,0 +1,79 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ae="using:AvaloniaEdit"
+             xmlns:md="using:Markdown.Avalonia"
+             x:Class="Arcane.App.Controls.MarkdownEditor"
+             Background="#0F0F14">
+
+    <UserControl.Styles>
+        <Style Selector="Button.mode-btn">
+            <Setter Property="Background"     Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius"   Value="6" />
+            <Setter Property="Padding"        Value="10,4" />
+            <Setter Property="FontSize"       Value="12" />
+            <Setter Property="Foreground"     Value="#8888AA" />
+            <Setter Property="Cursor"         Value="Hand" />
+        </Style>
+        <Style Selector="Button.mode-btn.active">
+            <Setter Property="Background" Value="#2A2A3E" />
+            <Setter Property="Foreground" Value="#E2E2F0" />
+        </Style>
+        <Style Selector="Button.mode-btn:pointerover">
+            <Setter Property="Background" Value="#222232" />
+        </Style>
+    </UserControl.Styles>
+
+    <DockPanel>
+
+        <!-- Toolbar -->
+        <Border DockPanel.Dock="Top"
+                Background="#1A1A24"
+                BorderBrush="#2A2A3E"
+                BorderThickness="0,0,0,1"
+                Padding="12,6">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="2">
+                    <Button x:Name="BtnEdit"    Classes="mode-btn active" Content="Edit" />
+                    <Button x:Name="BtnSplit"   Classes="mode-btn"        Content="Split" />
+                    <Button x:Name="BtnPreview" Classes="mode-btn"        Content="Preview" />
+                </StackPanel>
+                <StackPanel Grid.Column="2"
+                            Orientation="Horizontal"
+                            Spacing="12"
+                            VerticalAlignment="Center">
+                    <TextBlock x:Name="TbWordCount" FontSize="12" Foreground="#8888AA" />
+                    <TextBlock x:Name="TbCharCount" FontSize="12" Foreground="#8888AA" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Editor + Preview -->
+        <Grid x:Name="ContentGrid" ColumnDefinitions="*,5,*">
+            <ae:TextEditor x:Name="Editor"
+                           Grid.Column="0"
+                           FontFamily="JetBrains Mono,Cascadia Code,Consolas,monospace"
+                           FontSize="15"
+                           Background="#0F0F14"
+                           Foreground="#E2E2F0"
+                           ShowLineNumbers="False"
+                           WordWrap="True"
+                           HorizontalScrollBarVisibility="Disabled"
+                           Padding="24,16" />
+
+            <GridSplitter x:Name="Splitter"
+                          Grid.Column="1"
+                          Background="#2A2A3E"
+                          IsVisible="False" />
+
+            <Border x:Name="PreviewContainer"
+                        Grid.Column="2"
+                        Background="#0F0F14"
+                        Padding="24,16"
+                        IsVisible="False">
+                        <md:MarkdownScrollViewer x:Name="Preview" />
+            </Border>
+        </Grid>
+
+    </DockPanel>
+</UserControl>

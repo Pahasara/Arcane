@@ -90,7 +90,7 @@
                     <TextBox Text="{Binding Password, Mode=TwoWay}"
                              PasswordChar="{Binding ShowPassword,
                                             Converter={x:Static conv:BoolToPasswordCharConverter.Instance}}"
-                             Watermark="Enter your master password"
+                             PlaceholderText="Enter your master password"
                              Background="#0F0F14"
                              Foreground="#E2E2F0"
                              BorderBrush="#2A2A3E"
