@@ -1,0 +1,37 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Arcane.App.Controls.TagChip">
+
+    <UserControl.Styles>
+        <Style Selector="Border.chip">
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Padding"      Value="10,4" />
+        </Style>
+        <Style Selector="Border.chip.active">
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="BorderBrush"     Value="#E2E2F0" />
+        </Style>
+        <Style Selector="Button.remove-btn">
+            <Setter Property="Background"      Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding"         Value="4,0,0,0" />
+            <Setter Property="Cursor"          Value="Hand" />
+            <Setter Property="FontSize"        Value="11" />
+        </Style>
+    </UserControl.Styles>
+
+    <Border x:Name="ChipBorder" Classes="chip">
+        <StackPanel Orientation="Horizontal" Spacing="0">
+            <TextBlock x:Name="TbName"
+                       FontSize="12"
+                       FontWeight="Medium"
+                       VerticalAlignment="Center" />
+            <Button x:Name="BtnRemove"
+                    Classes="remove-btn"
+                    Content="✕"
+                    IsVisible="False"
+                    VerticalAlignment="Center" />
+        </StackPanel>
+    </Border>
+
+</UserControl>

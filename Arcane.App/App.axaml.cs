@@ -3,6 +3,7 @@ using Arcane.App.Services;
 using Arcane.App.ViewModels;
 using Arcane.App.ViewModels.Auth;
 using Arcane.App.ViewModels.Entries;
+using Arcane.App.ViewModels.Tags;
 using Arcane.Core.Data;
 using Arcane.Core.Encryption;
 using Arcane.Core.Helpers;
@@ -75,7 +76,8 @@ private static void ConfigureServices(ServiceCollection services)
     services.AddSingleton<IKeyDerivationService, KeyDerivationService>();
     services.AddSingleton<IVaultService,         VaultService>();
 
-    services.AddSingleton<IEntryService, EntryService>();
+    services.AddSingleton<IEntryService,         EntryService>();
+    services.AddSingleton<ITagService,           TagService>();
 
     // --- App-level ---
     services.AddSingleton<MainWindowViewModel>();
@@ -89,6 +91,7 @@ private static void ConfigureServices(ServiceCollection services)
     services.AddTransient<UnlockViewModel>();
     services.AddTransient<EntryListViewModel>();
     services.AddTransient<EntryEditorViewModel>();
+    services.AddTransient<TagManagerViewModel>();
     services.AddTransient<MainShellViewModel>();
 }
 }
