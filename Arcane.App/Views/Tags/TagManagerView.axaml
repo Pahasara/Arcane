@@ -1,0 +1,137 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Arcane.App.ViewModels.Tags"
+             xmlns:entities="using:Arcane.Core.Models.Entities"
+             x:DataType="vm:TagManagerViewModel"
+             x:Class="Arcane.App.Views.Tags.TagManagerView"
+             Background="#0F0F14">
+
+    <Grid RowDefinitions="Auto,*,Auto" Margin="32,24">
+
+        <!-- Header -->
+        <TextBlock Grid.Row="0"
+                   Text="Manage tags"
+                   FontSize="20"
+                   FontWeight="Bold"
+                   Foreground="#E2E2F0"
+                   Margin="0,0,0,20" />
+
+        <!-- Tag list -->
+        <ScrollViewer Grid.Row="1">
+            <ItemsControl ItemsSource="{Binding Tags}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="entities:Tag">
+                        <Border Background="#1A1A24"
+                                CornerRadius="8"
+                                Padding="14,10"
+                                Margin="0,0,0,6">
+                            <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+
+                                <!-- Color swatch -->
+                                <Ellipse Grid.Column="0"
+                                         Width="12" Height="12"
+                                         Fill="{Binding ColorHex}"
+                                         VerticalAlignment="Center"
+                                         Margin="0,0,10,0" />
+
+                                <!-- Name (double-click to edit — bound via ViewModel command) -->
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding Name}"
+                                           Foreground="#E2E2F0"
+                                           FontSize="14"
+                                           VerticalAlignment="Center"
+                                           DoubleTapped="OnTagNameDoubleTapped" />
+
+                                <!-- Rename -->
+                                <Button Grid.Column="2"
+                                        Content="✎"
+                                        Command="{Binding $parent[UserControl].((vm:TagManagerViewModel)DataContext).StartRenameCommand}"
+                                        CommandParameter="{Binding}"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Foreground="#8888AA"
+                                        Padding="8,4"
+                                        Cursor="Hand" />
+
+                                <!-- Delete -->
+                                <Button Grid.Column="3"
+                                        Content="🗑"
+                                        Command="{Binding $parent[UserControl].((vm:TagManagerViewModel)DataContext).DeleteTagCommand}"
+                                        CommandParameter="{Binding}"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Foreground="#8888AA"
+                                        Padding="8,4"
+                                        Cursor="Hand" />
+
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- New tag input row -->
+        <Border Grid.Row="2"
+                Background="#1A1A24"
+                CornerRadius="8"
+                Padding="14"
+                Margin="0,16,0,0">
+            <StackPanel Spacing="10">
+
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBox Grid.Column="0"
+                             Text="{Binding NewTagName, Mode=TwoWay}"
+                             PlaceholderText="New tag name"
+                             Background="#0F0F14"
+                             Foreground="#E2E2F0"
+                             BorderBrush="#2A2A3E"
+                             CornerRadius="6"
+                             Padding="10,8"
+                             Margin="0,0,10,0" />
+
+                    <Button Grid.Column="1"
+                            Content="Add"
+                            Command="{Binding CreateTagCommand}"
+                            Background="#7C3AED"
+                            Foreground="White"
+                            CornerRadius="6"
+                            Padding="18,8"
+                            Cursor="Hand" />
+                </Grid>
+
+                <!-- Color preset swatches -->
+                <ItemsControl ItemsSource="{x:Static vm:TagManagerViewModel.ColorPresets}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="x:String">
+                            <Button Width="24" Height="24"
+                                    Margin="0,0,6,6"
+                                    CornerRadius="12"
+                                    Padding="0"
+                                    Background="{Binding}"
+                                    BorderThickness="2"
+                                    BorderBrush="Transparent"
+                                    Command="{Binding $parent[UserControl].((vm:TagManagerViewModel)DataContext).SelectColorCommand}"
+                                    CommandParameter="{Binding}"
+                                    Cursor="Hand" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Error message -->
+                <TextBlock Text="{Binding ErrorMessage}"
+                           Foreground="#EF4444"
+                           FontSize="12"
+                           IsVisible="{Binding ErrorMessage,
+                                       Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+            </StackPanel>
+        </Border>
+
+    </Grid>
+
+</UserControl>
