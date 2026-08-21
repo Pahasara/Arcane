@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <Company>DvNET</Company>
   </PropertyGroup>
 
   <ItemGroup>
