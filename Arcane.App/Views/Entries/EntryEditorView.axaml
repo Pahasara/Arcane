@@ -3,14 +3,17 @@
              xmlns:vm="using:Arcane.App.ViewModels.Entries"
              xmlns:controls="using:Arcane.App.Controls"
              xmlns:conv="using:Arcane.App.Converters"
+             xmlns:entities="using:Arcane.Core.Models.Entities"
              x:DataType="vm:EntryEditorViewModel"
              x:Class="Arcane.App.Views.Entries.EntryEditorView"
              Background="#0F0F14">
 
-    <Grid RowDefinitions="Auto,Auto,*,Auto">
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
 
-        <!-- Row 0: Title + toolbar -->
-        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="24,16,24,0">
+        <!-- Row 0: Title + Toolbar -->
+        <Grid Grid.Row="0"
+              ColumnDefinitions="*,Auto"
+              Margin="24,16,24,0">
 
             <TextBox Grid.Column="0"
                      Text="{Binding Title, Mode=TwoWay}"
@@ -34,7 +37,7 @@
                            Foreground="#8888AA"
                            VerticalAlignment="Center"
                            IsVisible="{Binding SaveStatus,
-                                       Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                                               Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
 
                 <Button Command="{Binding ToggleFavoriteCommand}"
                         Background="Transparent"
@@ -42,8 +45,9 @@
                         Padding="6"
                         Cursor="Hand"
                         ToolTip.Tip="Toggle favourite">
+
                     <TextBlock Text="{Binding IsFavorite,
-                                      Converter={x:Static conv:BoolToStarConverter.Instance}}"
+                                              Converter={x:Static conv:BoolToStarConverter.Instance}}"
                                FontSize="16" />
                 </Button>
 
@@ -54,18 +58,22 @@
                         Cursor="Hand"
                         ToolTip.Tip="Delete entry"
                         IsVisible="{Binding !ShowDeleteConfirm}">
-                    <TextBlock Text="🗑" FontSize="16" />
+
+                    <TextBlock Text="🗑"
+                               FontSize="16" />
                 </Button>
 
             </StackPanel>
         </Grid>
 
-        <!-- Row 1: Date + MoodPicker -->
-        <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="24,8,24,8">
+        <!-- Row 1: Date + Mood Picker -->
+        <Grid Grid.Row="1"
+              ColumnDefinitions="*,Auto"
+              Margin="24,8,24,8">
 
             <TextBlock Grid.Column="0"
                        Text="{Binding CreatedAt,
-                              StringFormat='{}{0:dddd, dd MMMM yyyy}'}"
+                                      StringFormat='{}{0:dddd, dd MMMM yyyy}'}"
                        FontSize="13"
                        Foreground="#8888AA"
                        VerticalAlignment="Center" />
@@ -75,31 +83,117 @@
                                  VerticalAlignment="Center" />
         </Grid>
 
-        <!-- Row 2: Markdown editor -->
-        <controls:MarkdownEditor Grid.Row="2"
+        <!-- Row 2: Tags -->
+        <Border Grid.Row="2"
+                Margin="24,0,24,12">
+
+            <StackPanel Orientation="Horizontal"
+                        Spacing="6">
+
+                <ItemsControl ItemsSource="{Binding AssignedTags}">
+
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="entities:Tag">
+
+                            <controls:TagChip TagData="{Binding}"
+                                              IsRemovable="True"
+                                              Margin="0,0,6,0"
+                                              RemoveRequested="OnTagRemoveRequested" />
+
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+
+                </ItemsControl>
+
+                <!-- Add Tag Button -->
+                <Button Command="{Binding OpenTagPickerCommand}"
+                        Content="+ Add tag"
+                        Background="Transparent"
+                        BorderBrush="#2A2A3E"
+                        BorderThickness="1"
+                        Foreground="#8888AA"
+                        FontSize="12"
+                        CornerRadius="12"
+                        Padding="10,4"
+                        Cursor="Hand" />
+
+                <!-- Tag Picker -->
+                <Popup IsOpen="{Binding ShowTagPicker}"
+                       PlacementTarget="{Binding $parent[Border]}"
+                       Placement="BottomEdgeAlignedLeft">
+
+                    <Border Background="#1A1A24"
+                            BorderBrush="#2A2A3E"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="8"
+                            MinWidth="160"
+                            MaxHeight="200">
+
+                        <ScrollViewer>
+
+                            <ItemsControl ItemsSource="{Binding UnassignedTags}">
+
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="entities:Tag">
+
+                                        <Button Content="{Binding Name}"
+                                                Command="{Binding $parent[Popup].((vm:EntryEditorViewModel)DataContext).AddTagCommand}"
+                                                CommandParameter="{Binding}"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                Foreground="#E2E2F0"
+                                                HorizontalAlignment="Stretch"
+                                                HorizontalContentAlignment="Left"
+                                                Padding="8,6"
+                                                Cursor="Hand" />
+
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+
+                            </ItemsControl>
+
+                        </ScrollViewer>
+                    </Border>
+                </Popup>
+
+            </StackPanel>
+        </Border>
+
+        <!-- Row 3: Markdown Editor -->
+        <controls:MarkdownEditor Grid.Row="3"
                                  Text="{Binding Content, Mode=TwoWay}" />
 
-        <!-- Row 3: Error message -->
-        <TextBlock Grid.Row="3"
+        <!-- Row 4: Error Message -->
+        <TextBlock Grid.Row="4"
                    Text="{Binding ErrorMessage}"
                    Foreground="#EF4444"
                    FontSize="12"
                    Margin="24,4"
                    IsVisible="{Binding ErrorMessage,
-                               Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                                       Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
 
-        <!-- Row 3 (overlaps): Delete confirmation banner -->
-        <Border Grid.Row="3"
+        <!-- Row 4: Delete Confirmation Banner -->
+        <Border Grid.Row="4"
                 Background="#1A1A24"
                 BorderBrush="#EF4444"
                 BorderThickness="0,1,0,0"
                 Padding="24,12"
                 IsVisible="{Binding ShowDeleteConfirm}">
+
             <Grid ColumnDefinitions="*,Auto,Auto">
+
                 <TextBlock Grid.Column="0"
                            Text="Delete this entry? This cannot be undone."
                            Foreground="#E2E2F0"
                            VerticalAlignment="Center" />
+
                 <Button Grid.Column="1"
                         Content="Delete"
                         Command="{Binding ConfirmDeleteCommand}"
@@ -109,6 +203,7 @@
                         Padding="16,6"
                         Margin="0,0,8,0"
                         Cursor="Hand" />
+
                 <Button Grid.Column="2"
                         Content="Cancel"
                         Command="{Binding CancelDeleteCommand}"
@@ -117,6 +212,7 @@
                         CornerRadius="6"
                         Padding="16,6"
                         Cursor="Hand" />
+
             </Grid>
         </Border>
 

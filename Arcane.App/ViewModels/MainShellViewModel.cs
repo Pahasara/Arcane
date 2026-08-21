@@ -1,6 +1,8 @@
 using System;
 using System.Threading.Tasks;
+using Arcane.App.Services;
 using Arcane.App.ViewModels.Entries;
+using Arcane.App.ViewModels.Tags;
 using Arcane.Core.Models.DTOs;
 using Arcane.Core.Services.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -23,6 +25,7 @@ public partial class MainShellViewModel : ViewModelBase
     private readonly IVaultService    _vault;
     private readonly IEntryService    _entryService;
     private readonly IServiceProvider _services;
+    private readonly INavigationService _navigation;
 
     /// <summary>Sidebar entry list — always visible. Bound in MainShellView.axaml.</summary>
     public EntryListViewModel EntryList { get; }
@@ -38,11 +41,13 @@ public partial class MainShellViewModel : ViewModelBase
         IVaultService      vault,
         IEntryService      entryService,
         IServiceProvider   services,
+        INavigationService navigation,
         EntryListViewModel entryList) // DI-resolved, Transient
     {
         _vault        = vault;
         _entryService = entryService;
         _services     = services;
+        _navigation = navigation;
         EntryList     = entryList;
 
         EntryList.EntrySelected     = OpenEntryAsync;
@@ -108,4 +113,7 @@ public partial class MainShellViewModel : ViewModelBase
         CurrentEditor = null;
         _vault.Lock();
     }
+    
+    [RelayCommand]
+    private void OpenTagManager() => _navigation.NavigateTo<TagManagerViewModel>();
 }

@@ -4,9 +4,11 @@
              xmlns:vm="using:Arcane.App.ViewModels"
              xmlns:vmAuth="using:Arcane.App.ViewModels.Auth"
              xmlns:vmEntries="using:Arcane.App.ViewModels.Entries"
+             xmlns:vmTags="using:Arcane.App.ViewModels.Tags"
              xmlns:viewsAuth="using:Arcane.App.Views.Auth"
              xmlns:viewsShell="using:Arcane.App.Views.Shell"
              xmlns:viewsEntries="using:Arcane.App.Views.Entries"
+             xmlns:viewsTags="using:Arcane.App.Views.Tags"
              x:Class="Arcane.App.App"
              RequestedThemeVariant="Dark">
 
@@ -31,6 +33,10 @@
         <!-- Phase 2: editor resolved by ContentControl inside MainShellView -->
         <DataTemplate DataType="{x:Type vmEntries:EntryEditorViewModel}">
             <viewsEntries:EntryEditorView />
+        </DataTemplate>
+        
+        <DataTemplate DataType="{x:Type vmTags:TagManagerViewModel}">
+            <viewsTags:TagManagerView />
         </DataTemplate>
 
     </Application.DataTemplates>
