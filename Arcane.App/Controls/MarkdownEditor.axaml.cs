@@ -62,16 +62,12 @@ public partial class MarkdownEditor : UserControl
     {
         base.OnPropertyChanged(change);
 
-        if (change.Property == TextProperty && !_syncingFromProperty)
-        {
-            var newText = change.GetNewValue<string>();
-            if (Editor.Document.Text != newText)
-            {
-                _syncingFromProperty = true;
-                Editor.Document.Text  = newText;
-                _syncingFromProperty  = false;
-            }
-        }
+        if (change.Property != TextProperty || _syncingFromProperty) return;
+        var newText = change.GetNewValue<string>();
+        if (Editor.Document.Text == newText) return;
+        _syncingFromProperty = true;
+        Editor.Document.Text  = newText;
+        _syncingFromProperty  = false;
     }
 
     // Editor change (editor → binding)
@@ -88,7 +84,7 @@ public partial class MarkdownEditor : UserControl
         UpdateCounts(text);
 
         if (_mode is EditorMode.Split or EditorMode.Preview)
-            Preview.Markdown = text;
+            Preview.Text = Markdig.Markdown.ToPlainText(text);
     }
 
     // Mode switching
@@ -101,7 +97,7 @@ public partial class MarkdownEditor : UserControl
         PreviewContainer.IsVisible  = mode is EditorMode.Preview or EditorMode.Split;
 
         if (PreviewContainer.IsVisible)
-            Preview.Markdown = Editor.Document.Text;
+            Preview.Text = Markdig.Markdown.ToPlainText(Editor.Document.Text);
 
         ContentGrid.ColumnDefinitions[0].Width = mode == EditorMode.Preview
             ? new GridLength(0)
