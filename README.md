@@ -33,3 +33,27 @@ Arcane uses a zero-knowledge architecture. No unencrypted text ever hits the dis
 └── Arcane.Tests/     # xUnit test suites validating cryptographic roundtrips
 ```
 
+## Build and publish
+
+The repository targets .NET 10 and keeps generated files in `output/<Project>/bin` and
+`output/<Project>/obj` through the root `Directory.Build.props`. This keeps source trees
+clean and prevents generated sources from being compiled twice.
+
+```bash
+dotnet build Arcane.slnx
+dotnet test Arcane.Tests/Arcane.Tests.csproj
+```
+
+### Optimized desktop release
+
+The supported release format is a self-contained single-file executable with ReadyToRun
+native code. It does not require a .NET runtime on the user's machine and avoids trimming
+the reflection-heavy Avalonia and EF Core paths:
+
+```bash
+dotnet publish Arcane.App -c Release -r linux-x64 -o ./publish/linux-x64
+```
+
+The resulting `Arcane` executable is the only runtime file needed for Linux. Use
+`win-x64` for Windows (`Arcane.exe`) and `osx-arm64` for Apple Silicon macOS. 
+
