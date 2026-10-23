@@ -1,0 +1,26 @@
+<Project>
+  <PropertyGroup>
+    <Product>DvNET Arcane</Product>
+    <Company>Pahasara DvNET</Company>
+    <Copyright>Copyright © 2026 Pahasara DvNET</Copyright>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <Version Condition="'$(Version)' == ''">$(VersionPrefix)</Version>
+    <AssemblyVersion Condition="'$(AssemblyVersion)' == ''">$(VersionPrefix).0</AssemblyVersion>
+    <FileVersion Condition="'$(FileVersion)' == ''">$(VersionPrefix).0</FileVersion>
+    <InformationalVersion Condition="'$(InformationalVersion)' == ''">$(Version)</InformationalVersion>
+    <TargetFramework>net10.0</TargetFramework>
+    <BaseOutputPath>$(MSBuildThisFileDirectory)output/$(MSBuildProjectName)/bin/</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)output/$(MSBuildProjectName)/obj/</BaseIntermediateOutputPath>
+    <DefaultItemExcludes>$(DefaultItemExcludes);output/**;Output/**;**/bin/**;**/obj/**</DefaultItemExcludes>
+    <InvariantGlobalization>false</InvariantGlobalization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' != '' and '$(Configuration)' == 'Release'">
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <PublishTrimmed>false</PublishTrimmed>
+    <DebugType>None</DebugType>
+    <AllowedReferenceRelatedFileExtensions Condition="'$(AllowedReferenceRelatedFileExtensions)' == ''"></AllowedReferenceRelatedFileExtensions>
+  </PropertyGroup>
+</Project>

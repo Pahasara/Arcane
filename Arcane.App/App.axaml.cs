@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Arcane.App.Services;
 using Arcane.App.ViewModels;
 using Arcane.App.ViewModels.Auth;
@@ -35,17 +36,29 @@ public partial class App : Application
         _services = serviceCollection.BuildServiceProvider();
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            _ = InitializeDesktopAsync(desktop);
+
+        base.OnFrameworkInitializationCompleted();
+    }
+
+    private async Task InitializeDesktopAsync(IClassicDesktopStyleApplicationLifetime desktop)
+    {
+        try
         {
-            var mainVm      = _services.GetRequiredService<MainWindowViewModel>();
-            var vaultSvc    = _services.GetRequiredService<IVaultService>();
-            var navSvc      = _services.GetRequiredService<INavigationService>();
+            var services = _services ?? throw new InvalidOperationException(
+                "Arcane services were not initialized.");
+
+            await EnsureDatabaseAsync(services);
+
+            var mainVm   = services.GetRequiredService<MainWindowViewModel>();
+            var vaultSvc = services.GetRequiredService<IVaultService>();
+            var navSvc   = services.GetRequiredService<INavigationService>();
 
             // When the vault auto-locks (fires on a ThreadPool thread),
-            // dispatch to the UI thread and navigate back to UnlockView
+            // dispatch to the UI thread and navigate back to UnlockView.
             vaultSvc.VaultLocked += (_, _) =>
                 Dispatcher.UIThread.Post(() => navSvc.NavigateTo<UnlockViewModel>());
 
-            // Route to the correct first screen
             if (vaultSvc.VaultExists())
                 navSvc.NavigateTo<UnlockViewModel>();
             else
@@ -53,45 +66,56 @@ public partial class App : Application
 
             var mainWindow = new MainWindow { DataContext = mainVm };
 
-            // Wire inactivity reset — any pointer move or key press resets the auto-lock timer
+            // Any pointer move or key press resets the auto-lock timer.
             mainWindow.PointerMoved += (_, _) => vaultSvc.ResetInactivityTimer();
             mainWindow.KeyDown      += (_, _) => vaultSvc.ResetInactivityTimer();
 
-            // Lock the vault when the window closes (clears key from memory)
+            // Lock the vault when the window closes and clear its key from memory.
             mainWindow.Closing += (_, _) => vaultSvc.Lock();
 
             desktop.MainWindow = mainWindow;
+            mainWindow.Show();
         }
-
-        base.OnFrameworkInitializationCompleted();
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Arcane could not initialize its database: {ex}");
+            desktop.Shutdown(1);
+        }
     }
 
-private static void ConfigureServices(ServiceCollection services)
-{
-    // --- Core infrastructure ---
-    services.AddDbContextFactory<ArcaneDbContext>(options =>
-        options.UseSqlite($"Data Source={PathHelper.DatabasePath}"));
+    private static async Task EnsureDatabaseAsync(IServiceProvider services)
+    {
+        var dbFactory = services.GetRequiredService<IDbContextFactory<ArcaneDbContext>>();
+        await using var db = await dbFactory.CreateDbContextAsync();
+        await db.Database.MigrateAsync();
+    }
 
-    services.AddSingleton<IEncryptionService,    AesEncryptionService>();
-    services.AddSingleton<IKeyDerivationService, KeyDerivationService>();
-    services.AddSingleton<IVaultService,         VaultService>();
+    private static void ConfigureServices(ServiceCollection services)
+    {
+        // --- Core infrastructure ---
+        services.AddDbContextFactory<ArcaneDbContext>(options =>
+            options.UseSqlite($"Data Source={PathHelper.DatabasePath}"));
 
-    services.AddSingleton<IEntryService,         EntryService>();
-    services.AddSingleton<ITagService,           TagService>();
+        services.AddSingleton<IEncryptionService,    AesEncryptionService>();
+        services.AddSingleton<IKeyDerivationService, KeyDerivationService>();
+        services.AddSingleton<IVaultService,         VaultService>();
 
-    // --- App-level ---
-    services.AddSingleton<MainWindowViewModel>();
-    services.AddSingleton<INavigationService>(sp =>
-        new NavigationService(
-            sp.GetRequiredService<MainWindowViewModel>(),
-            sp));
+        services.AddSingleton<IEntryService, EntryService>();
+        services.AddSingleton<ITagService,   TagService>();
 
-    // --- ViewModels ---
-    services.AddTransient<SetupViewModel>();
-    services.AddTransient<UnlockViewModel>();
-    services.AddTransient<EntryListViewModel>();
-    services.AddTransient<EntryEditorViewModel>();
-    services.AddTransient<TagManagerViewModel>();
-    services.AddTransient<MainShellViewModel>();
-}
+        // --- App-level ---
+        services.AddSingleton<MainWindowViewModel>();
+        services.AddSingleton<INavigationService>(sp =>
+            new NavigationService(
+                sp.GetRequiredService<MainWindowViewModel>(),
+                sp));
+
+        // --- ViewModels ---
+        services.AddTransient<SetupViewModel>();
+        services.AddTransient<UnlockViewModel>();
+        services.AddTransient<EntryListViewModel>();
+        services.AddTransient<EntryEditorViewModel>();
+        services.AddTransient<TagManagerViewModel>();
+        services.AddTransient<MainShellViewModel>();
+    }
 }

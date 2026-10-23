@@ -31,9 +31,11 @@ public partial class EntryEditorViewModel : ViewModelBase
     private Guid             _entryId;
     private DispatcherTimer? _autoSaveTimer;
     private bool             _isLoading;
+    private bool _hasUnsavedChanges;
 
     public Action<EntryDto>? OnEntrySaved;
     public Action<Guid>?     OnEntryDeleted;
+    public Action? OpenTagManagerRequested;
 
     [ObservableProperty] private string     _title             = string.Empty;
     [ObservableProperty] private string     _content           = string.Empty;
@@ -74,6 +76,7 @@ public partial class EntryEditorViewModel : ViewModelBase
     // Load
     public async Task LoadAsync(Guid entryId)
     {
+        Dispose();
         _entryId = entryId;
         IsBusy   = true;
 
@@ -82,17 +85,24 @@ public partial class EntryEditorViewModel : ViewModelBase
             var entry = await _entryService.GetByIdAsync(entryId, _vault.GetKey());
 
             _isLoading    = true;
-            Title         = entry.Title;
-            Content       = entry.Content;
-            SelectedMood  = entry.Mood;
-            IsFavorite    = entry.IsFavorite;
-            CreatedAt     = entry.CreatedAt;
-            AssignedTags  = new ObservableCollection<Tag>(entry.Tags);
-            _isLoading    = false;
+            try
+            {
+                Title         = entry.Title;
+                Content       = entry.Content;
+                SelectedMood  = entry.Mood;
+                IsFavorite    = entry.IsFavorite;
+                CreatedAt     = entry.CreatedAt;
+                AssignedTags  = new ObservableCollection<Tag>(entry.Tags);
 
-            var allTags = await _tagService.GetAllAsync();
-            AllTags = new ObservableCollection<Tag>(allTags);
+                await RefreshTagsAsync();
+            }
 
+            finally
+            {
+                _isLoading = false;
+            }
+
+            _hasUnsavedChanges = false;
             InitAutoSaveTimer();
         }
         finally
@@ -101,19 +111,45 @@ public partial class EntryEditorViewModel : ViewModelBase
         }
     }
 
+    public async Task RefreshTagsAsync()
+    {
+        var tags = await _tagService.GetAllAsync();
+        AllTags = new ObservableCollection<Tag>(tags);
+        OnPropertyChanged(nameof(UnassignedTags));
+    }
+
     // Auto-save
-    partial void OnTitleChanged(string value)        { if (!_isLoading) ResetAutoSaveTimer(); }
-    partial void OnContentChanged(string value)       { if (!_isLoading) ResetAutoSaveTimer(); }
-    partial void OnSelectedMoodChanged(MoodLevel? value) { if (!_isLoading) ResetAutoSaveTimer(); }
+    partial void OnTitleChanged(string value) =>
+        MarkUnsavedIfReady();
+
+    partial void OnContentChanged(string value) =>
+        MarkUnsavedIfReady();
+
+    partial void OnSelectedMoodChanged(MoodLevel? value) =>
+        MarkUnsavedIfReady();
+
+    private void MarkUnsavedIfReady()
+    {
+        if (_isLoading) return;
+
+        _hasUnsavedChanges = true;
+        ResetAutoSaveTimer();
+    }
 
     private void InitAutoSaveTimer()
     {
-        _autoSaveTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
-        _autoSaveTimer.Tick += async (_, _) =>
-        {
-            _autoSaveTimer.Stop();
-            await SaveAsync();
-        };
+        _autoSaveTimer = new DispatcherTimer(
+            TimeSpan.FromSeconds(2),
+            DispatcherPriority.Background,
+            OnAutoSaveTick);
+    }
+
+    private async void OnAutoSaveTick(object? sender, EventArgs e)
+    {
+        if (_autoSaveTimer is null) return;
+
+        _autoSaveTimer.Stop();
+        await SaveAsync();
     }
 
     private void ResetAutoSaveTimer()
@@ -124,9 +160,12 @@ public partial class EntryEditorViewModel : ViewModelBase
     }
 
     // Save
+    [RelayCommand]
+    private Task SaveNowAsync() => SaveAsync();
+
     private async Task SaveAsync()
     {
-        if (_entryId == Guid.Empty) return;
+        if (_entryId == Guid.Empty || !_hasUnsavedChanges) return;
 
         SaveStatus = "Saving…";
         try
@@ -139,9 +178,11 @@ public partial class EntryEditorViewModel : ViewModelBase
             var updated = await _entryService.UpdateAsync(
                 _entryId, request, _vault.GetKey());
 
+            _hasUnsavedChanges = false;
             SaveStatus = "Saved ✓";
             OnEntrySaved?.Invoke(updated);
         }
+
         catch (Exception ex)
         {
             SaveStatus   = "Save failed";
@@ -149,7 +190,12 @@ public partial class EntryEditorViewModel : ViewModelBase
         }
     }
 
+    public Task SavePendingAsync() => SaveAsync();
+
     // Tag assignment
+    [RelayCommand]
+    private void OpenTagManager() => OpenTagManagerRequested?.Invoke();
+
     [RelayCommand]
     private void OpenTagPicker() => ShowTagPicker = true;
 
@@ -164,6 +210,7 @@ public partial class EntryEditorViewModel : ViewModelBase
         AssignedTags.Add(tag);
         OnPropertyChanged(nameof(UnassignedTags));
         ShowTagPicker = false;
+        _hasUnsavedChanges = true;
         ResetAutoSaveTimer(); // persist immediately via the normal auto-save flow
     }
 
@@ -175,6 +222,7 @@ public partial class EntryEditorViewModel : ViewModelBase
 
         AssignedTags.Remove(existing);
         OnPropertyChanged(nameof(UnassignedTags));
+        _hasUnsavedChanges = true;
         ResetAutoSaveTimer();
     }
 
@@ -183,6 +231,7 @@ public partial class EntryEditorViewModel : ViewModelBase
     private void ToggleFavorite()
     {
         IsFavorite = !IsFavorite;
+        _hasUnsavedChanges = true;
         ResetAutoSaveTimer();
     }
 

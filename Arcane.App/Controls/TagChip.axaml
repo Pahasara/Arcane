@@ -9,7 +9,15 @@
         </Style>
         <Style Selector="Border.chip.active">
             <Setter Property="BorderThickness" Value="2" />
-            <Setter Property="BorderBrush"     Value="#E2E2F0" />
+            <Setter Property="BorderBrush"     Value="{DynamicResource ArcaneText}" />
+        </Style>
+        <Style Selector="Border.chip:pointerover">
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ArcaneAccent}" />
+        </Style>
+        <Style Selector="Border.chip:pressed">
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ArcaneAccentPressed}" />
         </Style>
         <Style Selector="Button.remove-btn">
             <Setter Property="Background"      Value="Transparent" />

@@ -4,7 +4,7 @@
              xmlns:conv="using:Arcane.App.Converters"
              x:DataType="vm:UnlockViewModel"
              x:Class="Arcane.App.Views.Auth.UnlockView"
-             Background="#0F0F14">
+             Background="{DynamicResource ArcaneSurface}">
 
     <UserControl.Styles>
         <!-- Shake animation: fires when ShakeError becomes true -->
@@ -36,39 +36,38 @@
         </Style>
     </UserControl.Styles>
 
-    <Grid RowDefinitions="*, Auto, *">
-        <Border Grid.Row="1"
-                Background="#1A1A24"
-                CornerRadius="16"
-                Padding="48,40"
-                Width="420"
-                HorizontalAlignment="Center"
-                BoxShadow="0 8 32 0 #40000000">
+    <Grid>
+        <Border Padding="28,24"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Background="Transparent">
 
             <StackPanel Spacing="0">
 
                 <!-- Logo / wordmark -->
-                <StackPanel HorizontalAlignment="Center" Spacing="8" Margin="0,0,0,32">
-                    <TextBlock Text="🔒"
-                               FontSize="40"
+                <StackPanel HorizontalAlignment="Center" Spacing="6" Margin="0,0,0,24">
+                    <TextBlock Text=""
+                               Classes="nerd-icon"
+                               FontSize="42"
+                               Foreground="{DynamicResource ArcaneAccent}"
                                HorizontalAlignment="Center" />
                     <TextBlock Text="Arcane"
-                               FontSize="28"
+                               FontSize="24"
                                FontWeight="Bold"
-                               Foreground="#E2E2F0"
+                               Foreground="{DynamicResource ArcaneText}"
                                HorizontalAlignment="Center"
                                LetterSpacing="3" />
                     <TextBlock Text="Your thoughts. Yours alone."
                                FontSize="12"
-                               Foreground="#8888AA"
+                               Foreground="{DynamicResource ArcaneTextMuted}"
                                HorizontalAlignment="Center" />
                 </StackPanel>
 
                 <TextBlock Text="Unlock your vault"
                            FontSize="16"
                            FontWeight="SemiBold"
-                           Foreground="#E2E2F0"
-                           Margin="0,0,0,20" />
+                           Foreground="{DynamicResource ArcaneText}"
+                           Margin="0,0,0,16" />
 
                 <!--
                     Password input wrapped in a Border so we can apply the shake animation.
@@ -80,7 +79,7 @@
                         Classes.shake="{Binding ShakeError}">
                     <TextBlock Text="Master password"
                                FontSize="12"
-                               Foreground="#8888AA"
+                               Foreground="{DynamicResource ArcaneTextMuted}"
                                Margin="0,0,0,6" />
                 </Border>
 
@@ -91,18 +90,19 @@
                              PasswordChar="{Binding ShowPassword,
                                             Converter={x:Static conv:BoolToPasswordCharConverter.Instance}}"
                              PlaceholderText="Enter your master password"
-                             Background="#0F0F14"
-                             Foreground="#E2E2F0"
-                             BorderBrush="#2A2A3E"
+                             Background="{DynamicResource ArcaneBackground}"
+                             Foreground="{DynamicResource ArcaneText}"
+                             BorderBrush="{DynamicResource ArcaneBorder}"
                              CornerRadius="8"
-                             Padding="12,10">
+                             Padding="12,10"
+                             KeyDown="OnPasswordKeyDown">
                         <TextBox.InnerRightContent>
                             <Button Command="{Binding ToggleShowPasswordCommand}"
                                     Background="Transparent"
                                     BorderThickness="0"
                                     Padding="8,0"
                                     Cursor="Hand">
-                                <TextBlock Text="👁" FontSize="14" />
+                                <TextBlock Text="󰈈" Classes="nerd-icon" FontSize="18" />
                             </Button>
                         </TextBox.InnerRightContent>
                     </TextBox>
@@ -110,7 +110,7 @@
 
                 <!-- Error message -->
                 <TextBlock Text="{Binding ErrorMessage}"
-                           Foreground="#EF4444"
+                           Foreground="{DynamicResource ArcaneDanger}"
                            FontSize="13"
                            Margin="0,0,0,16"
                            IsVisible="{Binding ErrorMessage,
@@ -120,7 +120,7 @@
                 <Button Command="{Binding UnlockCommand}"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Center"
-                        Background="#7C3AED"
+                        Classes="accent"
                         Foreground="#FFFFFF"
                         CornerRadius="8"
                         Padding="0,12"
@@ -143,7 +143,7 @@
                 <!-- Vault creation date hint -->
                 <TextBlock Text="{Binding VaultHint}"
                            FontSize="12"
-                           Foreground="#8888AA"
+                           Foreground="{DynamicResource ArcaneTextMuted}"
                            HorizontalAlignment="Center"
                            IsVisible="{Binding VaultHint,
                                        Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />

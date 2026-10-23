@@ -17,19 +17,36 @@
             <Setter Property="VerticalContentAlignment"     Value="Center" />
         </Style>
         <Style Selector="Button.mood-btn:pointerover">
-            <Setter Property="Background" Value="#2A2A3E" />
+            <Setter Property="Background" Value="{DynamicResource ArcaneControlHover}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ArcaneAccent}" />
+        </Style>
+        <Style Selector="Button.mood-btn:pressed">
+            <Setter Property="Background" Value="{DynamicResource ArcaneControlPressed}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ArcaneAccentPressed}" />
+        </Style>
+        <Style Selector="Button.mood-btn:focus">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="FocusAdorner" Value="{x:Null}" />
+        </Style>
+        <Style Selector="Button.mood-btn:pointerover:focus">
+            <Setter Property="Background" Value="{DynamicResource ArcaneControlHover}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ArcaneAccent}" />
         </Style>
         <Style Selector="Button.mood-btn.selected">
-            <Setter Property="BorderBrush" Value="#7C3AED" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ArcaneAccent}" />
+        </Style>
+        <Style Selector="Button.mood-btn.selected:focus">
+            <Setter Property="BorderBrush" Value="{DynamicResource ArcaneAccent}" />
         </Style>
     </UserControl.Styles>
 
     <StackPanel Orientation="Horizontal" Spacing="4">
-        <Button x:Name="BtnAwful"   Classes="mood-btn" Content="😞" ToolTip.Tip="Awful" />
-        <Button x:Name="BtnBad"     Classes="mood-btn" Content="😕" ToolTip.Tip="Bad" />
-        <Button x:Name="BtnNeutral" Classes="mood-btn" Content="😐" ToolTip.Tip="Neutral" />
-        <Button x:Name="BtnGood"    Classes="mood-btn" Content="🙂" ToolTip.Tip="Good" />
-        <Button x:Name="BtnGreat"   Classes="mood-btn" Content="😊" ToolTip.Tip="Great" />
+        <Button x:Name="BtnAwful"   Classes="mood-btn" Content="😞" />
+        <Button x:Name="BtnBad"     Classes="mood-btn" Content="😕" />
+        <Button x:Name="BtnNeutral" Classes="mood-btn" Content="😐" />
+        <Button x:Name="BtnGood"    Classes="mood-btn" Content="🙂" />
+        <Button x:Name="BtnGreat"   Classes="mood-btn" Content="😊" />
     </StackPanel>
 
 </UserControl>

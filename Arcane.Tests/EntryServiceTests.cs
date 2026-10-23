@@ -168,6 +168,21 @@ public sealed class EntryServiceTests : IAsyncLifetime
         updated.UpdatedAt.Should().BeAfter(originalAt);
     }
 
+    [Fact]
+    public async Task Update_DoesNotChangeUpdatedAt_WhenValuesAreUnchanged()
+    {
+        var created = await _sut.CreateAsync(
+            new CreateEntryRequest("T", "C", MoodLevel.Good, []), TestKey);
+
+        await Task.Delay(20, TestContext.Current.CancellationToken);
+        var unchanged = await _sut.UpdateAsync(
+            created.Id,
+            new UpdateEntryRequest("T", "C", MoodLevel.Good, [], false),
+            TestKey);
+
+        unchanged.UpdatedAt.Should().Be(created.UpdatedAt);
+    }
+
     // ToggleFavoriteAsync
     [Fact]
     public async Task ToggleFavorite_FlipsFlag()

@@ -1,8 +1,9 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:ae="using:AvaloniaEdit"
+             xmlns:mv="using:MarkView.Avalonia"
              x:Class="Arcane.App.Controls.MarkdownEditor"
-             Background="#0F0F14">
+             Background="{DynamicResource ArcaneBackground}">
     <UserControl.Styles>
         <Style Selector="Button.mode-btn">
             <Setter Property="Background"     Value="Transparent" />
@@ -10,22 +11,38 @@
             <Setter Property="CornerRadius"   Value="6" />
             <Setter Property="Padding"        Value="10,4" />
             <Setter Property="FontSize"       Value="12" />
-            <Setter Property="Foreground"     Value="#8888AA" />
+            <Setter Property="Foreground"     Value="{DynamicResource ArcaneTextMuted}" />
             <Setter Property="Cursor"         Value="Hand" />
+            <Setter Property="FocusAdorner"   Value="{x:Null}" />
         </Style>
         <Style Selector="Button.mode-btn.active">
-            <Setter Property="Background" Value="#2A2A3E" />
-            <Setter Property="Foreground" Value="#E2E2F0" />
+            <Setter Property="Background" Value="{DynamicResource ArcaneSurfaceRaised}" />
+            <Setter Property="Foreground" Value="{DynamicResource ArcaneText}" />
         </Style>
         <Style Selector="Button.mode-btn:pointerover">
-            <Setter Property="Background" Value="#222232" />
+            <Setter Property="Background" Value="{DynamicResource ArcaneControlHover}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ArcaneAccent}" />
+            <Setter Property="Foreground" Value="{DynamicResource ArcaneAccentHover}" />
+        </Style>
+        <Style Selector="Button.mode-btn:pressed">
+            <Setter Property="Background" Value="{DynamicResource ArcaneControlPressed}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ArcaneAccentPressed}" />
+            <Setter Property="Foreground" Value="{DynamicResource ArcaneAccentHover}" />
+        </Style>
+        <Style Selector="Button.mode-btn:focus">
+            <Setter Property="Background" Value="{DynamicResource ArcaneSurfaceRaised}" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+        </Style>
+        <Style Selector="Button.mode-btn:pointerover:focus">
+            <Setter Property="Background" Value="{DynamicResource ArcaneControlHover}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ArcaneAccent}" />
         </Style>
     </UserControl.Styles>
     <DockPanel>
         <!-- Toolbar -->
         <Border DockPanel.Dock="Top"
-                Background="#1A1A24"
-                BorderBrush="#2A2A3E"
+                Background="{DynamicResource ArcaneSurface}"
+                BorderBrush="{DynamicResource ArcaneBorder}"
                 BorderThickness="0,0,0,1"
                 Padding="12,6">
             <Grid ColumnDefinitions="Auto,*,Auto">
@@ -38,8 +55,8 @@
                             Orientation="Horizontal"
                             Spacing="12"
                             VerticalAlignment="Center">
-                    <TextBlock x:Name="TbWordCount" FontSize="12" Foreground="#8888AA" />
-                    <TextBlock x:Name="TbCharCount" FontSize="12" Foreground="#8888AA" />
+                    <TextBlock x:Name="TbWordCount" FontSize="12" Foreground="{DynamicResource ArcaneTextMuted}" />
+                    <TextBlock x:Name="TbCharCount" FontSize="12" Foreground="{DynamicResource ArcaneTextMuted}" />
                 </StackPanel>
             </Grid>
         </Border>
@@ -47,29 +64,31 @@
         <Grid x:Name="ContentGrid" ColumnDefinitions="*,5,*">
             <ae:TextEditor x:Name="Editor"
                            Grid.Column="0"
-                           FontFamily="JetBrains Mono,Cascadia Code,Consolas,monospace"
+                           FontFamily="avares://Arcane/Assets/Fonts#Comic Sans MS"
                            FontSize="15"
-                           Background="#0F0F14"
-                           Foreground="#E2E2F0"
+                           Background="{DynamicResource ArcaneBackground}"
+                           Foreground="{DynamicResource ArcaneText}"
                            ShowLineNumbers="False"
                            WordWrap="True"
+                           VerticalScrollBarVisibility="Auto"
                            HorizontalScrollBarVisibility="Disabled"
                            Padding="24,16" />
             <GridSplitter x:Name="Splitter"
                           Grid.Column="1"
-                          Background="#2A2A3E"
+                          Background="{DynamicResource ArcaneBorder}"
                           IsVisible="False" />
             <Border x:Name="PreviewContainer"
                         Grid.Column="2"
-                        Background="#0F0F14"
+                        Background="{DynamicResource ArcaneBackground}"
                         Padding="24,16"
                         IsVisible="False">
-                <ScrollViewer>
-                    <SelectableTextBlock x:Name="Preview"
-                                         TextWrapping="Wrap"
-                                         Foreground="#E2E2F0"
-                                         FontSize="15" />
-                </ScrollViewer>
+                <mv:MarkdownViewer x:Name="Preview"
+                                   Background="{DynamicResource ArcaneBackground}"
+                                   Foreground="{DynamicResource ArcaneText}"
+                                   FontFamily="avares://Arcane/Assets/Fonts#Comic Sans MS"
+                                   Padding="8"
+                                   HorizontalAlignment="Stretch"
+                                   Markdown="" />
             </Border>
         </Grid>
     </DockPanel>

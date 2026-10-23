@@ -14,8 +14,14 @@ public sealed class RelativeDateConverter : IValueConverter
 
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is not DateTime utc) return string.Empty;
+        if (value is not DateTime dateTime) return string.Empty;
 
+        var utc = dateTime.Kind switch
+        {
+            DateTimeKind.Utc => dateTime,
+            DateTimeKind.Local => dateTime.ToUniversalTime(),
+            _ => DateTime.SpecifyKind(dateTime, DateTimeKind.Utc)
+        };
         var diff = DateTime.UtcNow - utc;
 
         return diff.TotalSeconds switch

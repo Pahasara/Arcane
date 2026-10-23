@@ -1,0 +1,15 @@
+<Project>
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' != '' and '$(Configuration)' == 'Release'">
+    <DebugType>None</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+
+  <Target Name="RemoveReleasePublishSymbols"
+          AfterTargets="Publish"
+          Condition="'$(RuntimeIdentifier)' != '' and '$(Configuration)' == 'Release'">
+    <ItemGroup>
+      <ReleasePublishSymbols Include="$(PublishDir)**/*.pdb" />
+    </ItemGroup>
+    <Delete Files="@(ReleasePublishSymbols)" />
+  </Target>
+</Project>

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Arcane.Core.Models.DTOs;
 using Arcane.Core.Models.Entities;
-using Arcane.Core.Models.Enums;
 using Arcane.Core.Services.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -13,11 +12,11 @@ using CommunityToolkit.Mvvm.Input;
 namespace Arcane.App.ViewModels.Entries;
 
 /// <summary>
-/// Manages the sidebar entry list, including tag and mood filtering.
+/// Manages the sidebar entry list, including tag filtering.
 ///
 /// _allEntries is the unfiltered master list, loaded once via LoadAsync().
 /// Entries is the filtered, bound collection the ListBox displays.
-/// Whenever ActiveTagFilters or ActiveMoodFilter changes, ApplyFilters()
+/// Whenever ActiveTagFilters changes, ApplyFilters()
 /// re-derives Entries from _allEntries — the master list is never mutated
 /// by filtering, only by explicit UpsertEntry/RemoveEntry calls.
 /// </summary>
@@ -28,6 +27,7 @@ public partial class EntryListViewModel : ViewModelBase
     private readonly IVaultService _vault;
 
     private List<EntryDto> _allEntries = [];
+    private Guid? _selectedEntryId;
 
     // Wired by MainShellViewModel
     public Func<Guid, Task>? EntrySelected;
@@ -49,10 +49,6 @@ public partial class EntryListViewModel : ViewModelBase
     /// <summary>Tags currently active as filters. AND logic — an entry must have all of them.</summary>
     [ObservableProperty]
     private ObservableCollection<Tag> _activeTagFilters = [];
-
-    /// <summary>Active mood filter, or null for no mood filter.</summary>
-    [ObservableProperty]
-    private MoodLevel? _activeMoodFilter;
 
     public EntryListViewModel(
         IEntryService entryService,
@@ -94,8 +90,6 @@ public partial class EntryListViewModel : ViewModelBase
     }
 
     // Filtering
-    partial void OnActiveMoodFilterChanged(MoodLevel? value) => ApplyFilters();
-
     /// <summary>Toggles a tag filter on/off. Bound to TagChip.Clicked in the filter bar.</summary>
     [RelayCommand]
     private void ToggleTagFilter(Tag tag)
@@ -108,26 +102,15 @@ public partial class EntryListViewModel : ViewModelBase
         // CollectionChanged handler (wired in constructor) triggers ApplyFilters()
     }
 
-    /// <summary>Toggles the mood filter. Clicking the active mood again clears it.</summary>
-    [RelayCommand]
-    private void ToggleMoodFilter(MoodLevel mood)
-    {
-        ActiveMoodFilter = ActiveMoodFilter == mood ? null : mood;
-    }
-
     [RelayCommand]
     private void ClearFilters()
     {
         ActiveTagFilters.Clear();
-        ActiveMoodFilter = null;
     }
 
     private void ApplyFilters()
     {
         IEnumerable<EntryDto> filtered = _allEntries;
-
-        if (ActiveMoodFilter is not null)
-            filtered = filtered.Where(e => e.Mood == ActiveMoodFilter);
 
         if (ActiveTagFilters.Count > 0)
         {
@@ -144,7 +127,17 @@ public partial class EntryListViewModel : ViewModelBase
     // Selection
     partial void OnSelectedEntryChanged(EntryDto? value)
     {
-        if (value is not null && EntrySelected is not null)
+        if (value is null)
+        {
+            _selectedEntryId = null;
+            return;
+        }
+
+        if (_selectedEntryId == value.Id)
+            return;
+
+        _selectedEntryId = value.Id;
+        if (EntrySelected is not null)
             _ = EntrySelected(value.Id);
     }
 
@@ -161,11 +154,15 @@ public partial class EntryListViewModel : ViewModelBase
     // (the master list) and then re-apply filters so Entries stays in sync.
     public void UpsertEntry(EntryDto updated)
     {
+        var wasSelected = _selectedEntryId == updated.Id;
         var index = _allEntries.FindIndex(e => e.Id == updated.Id);
         if (index >= 0) _allEntries[index] = updated;
         else            _allEntries.Insert(0, updated);
 
         ApplyFilters();
+
+        if (wasSelected)
+            SelectedEntry = Entries.FirstOrDefault(e => e.Id == updated.Id);
     }
 
     public void RemoveEntry(Guid id)

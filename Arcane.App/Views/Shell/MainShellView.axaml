@@ -4,62 +4,75 @@
              xmlns:viewsEntries="using:Arcane.App.Views.Entries"
              x:DataType="vm:MainShellViewModel"
              x:Class="Arcane.App.Views.Shell.MainShellView"
-             Background="#0F0F14">
+             Background="{DynamicResource ArcaneBackground}">
+
+    <UserControl.Styles>
+        <Style Selector="Button.sidebar-action">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="FocusAdorner" Value="{x:Null}" />
+        </Style>
+        <Style Selector="Button.sidebar-action:pointerover">
+            <Setter Property="Background" Value="{DynamicResource ArcaneControlHover}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ArcaneAccent}" />
+        </Style>
+        <Style Selector="Button.sidebar-action:pressed">
+            <Setter Property="Background" Value="{DynamicResource ArcaneControlPressed}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ArcaneAccentPressed}" />
+        </Style>
+    </UserControl.Styles>
 
     <Grid ColumnDefinitions="280,1,*">
 
         <!-- Column 0: Sidebar -->
-        <DockPanel Grid.Column="0" Background="#1A1A24">
+        <DockPanel Grid.Column="0" Background="{DynamicResource ArcaneSurface}">
 
             <Border DockPanel.Dock="Top"
-                    BorderBrush="#2A2A3E"
+                    BorderBrush="{DynamicResource ArcaneBorder}"
                     BorderThickness="0,0,0,1"
-                    Padding="16,12">
-                <Grid ColumnDefinitions="*,Auto,Auto,Auto">
-
-                    <TextBlock Grid.Column="0"
-                               Text="Arcane"
-                               FontSize="18"
-                               FontWeight="Bold"
-                               Foreground="#E2E2F0"
-                               VerticalAlignment="Center"
-                               LetterSpacing="2" />
+                    Padding="20,16">
+                <Grid ColumnDefinitions="*,Auto,Auto"
+                      ColumnSpacing="10">
+                    <StackPanel Grid.Column="0"
+                                Orientation="Horizontal"
+                                Spacing="10"
+                                VerticalAlignment="Center">
+                        <TextBlock Text=""
+                                   Classes="nerd-icon"
+                                   FontSize="30"
+                                   Foreground="{DynamicResource ArcaneAccent}"
+                                   VerticalAlignment="Center" />
+                        <TextBlock Text="Arcane"
+                                   FontSize="20"
+                                   FontWeight="Bold"
+                                   Foreground="{DynamicResource ArcaneText}"
+                                   VerticalAlignment="Center"
+                                   LetterSpacing="1.5" />
+                    </StackPanel>
 
                     <Button Grid.Column="1"
                             Command="{Binding EntryList.NewEntryCommand}"
-                            Background="Transparent"
-                            BorderThickness="0"
-                            Padding="6"
-                            Margin="0,0,4,0"
+                            Classes="sidebar-action"
+                            Padding="8,6"
                             Cursor="Hand"
-                            ToolTip.Tip="New entry (Ctrl+N)">
+                            VerticalAlignment="Center">
                         <TextBlock Text="＋"
                                    FontSize="18"
-                                   Foreground="#7C3AED"
+                                   Foreground="{DynamicResource ArcaneAccent}"
                                    FontWeight="Bold" />
                     </Button>
                     
                     <Button Grid.Column="2"
-                            Command="{Binding OpenTagManagerCommand}"
-                            Background="Transparent"
-                            BorderThickness="0"
-                            Padding="6"
-                            Margin="0,0,4,0"
-                            Cursor="Hand"
-                        ToolTip.Tip="Manage tags (temporary — Settings comes in Phase 8)">
-                        <TextBlock Text="🏷" FontSize="16" />
-                    </Button>
-
-                    <Button Grid.Column="3"
                             Command="{Binding LockCommand}"
-                            Background="Transparent"
-                            BorderThickness="0"
-                            Padding="6"
+                            Classes="sidebar-action"
+                            Padding="8,6"
                             Cursor="Hand"
-                            ToolTip.Tip="Lock vault (Ctrl+L)">
-                        <TextBlock Text="🔒" FontSize="16" />
+                            VerticalAlignment="Center">
+                        <TextBlock Text=""
+                                   Classes="nerd-icon"
+                                   FontSize="20"
+                                   Foreground="{DynamicResource ArcaneTextMuted}" />
                     </Button>
-
                 </Grid>
             </Border>
 
@@ -68,29 +81,30 @@
         </DockPanel>
 
         <!-- Column 1: Divider -->
-        <Border Grid.Column="1" Background="#2A2A3E" />
+        <Border Grid.Column="1" Background="{DynamicResource ArcaneBorder}" />
 
         <!-- Column 2: Editor panel -->
         <Grid Grid.Column="2">
-
             <StackPanel HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        Spacing="12"
+                        Spacing="16"
                         IsVisible="{Binding CurrentEditor,
                                     Converter={x:Static ObjectConverters.IsNull}}">
-                <TextBlock Text="📔"
-                           FontSize="48"
+                <TextBlock Text="󰠮"
+                           Classes="nerd-icon"
+                           FontSize="52"
+                           Foreground="{DynamicResource ArcaneAccent}"
                            HorizontalAlignment="Center" />
                 <TextBlock Text="Select an entry or create a new one"
                            FontSize="14"
-                           Foreground="#8888AA"
+                           Foreground="{DynamicResource ArcaneTextMuted}"
                            HorizontalAlignment="Center" />
                 <Button Content="＋ New entry"
                         Command="{Binding EntryList.NewEntryCommand}"
-                        Background="#7C3AED"
+                        Classes="accent"
                         Foreground="White"
                         CornerRadius="8"
-                        Padding="20,10"
+                        Padding="20,11"
                         HorizontalAlignment="Center"
                         Cursor="Hand" />
             </StackPanel>

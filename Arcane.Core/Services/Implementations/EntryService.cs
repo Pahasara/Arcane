@@ -100,7 +100,21 @@ public sealed class EntryService(IDbContextFactory<ArcaneDbContext> dbFactory, I
             .FirstOrDefaultAsync(e => e.Id == id)
             ?? throw new KeyNotFoundException($"Entry {id} not found.");
 
-        // Re-encrypt with fresh nonces
+        var currentTitle = DecryptField(entry.TitleEncrypted, entry.TitleNonce, masterKey);
+        var currentContent = DecryptField(entry.ContentEncrypted, entry.ContentNonce, masterKey);
+        var requestedTagIds = req.TagIds.ToHashSet();
+        var currentTagIds = entry.EntryTags.Select(et => et.TagId).ToHashSet();
+
+        if (currentTitle == req.Title &&
+            currentContent == req.Content &&
+            entry.Mood == req.Mood &&
+            entry.IsFavorite == req.IsFavorite &&
+            currentTagIds.SetEquals(requestedTagIds))
+        {
+            return await GetByIdAsync(id, masterKey);
+        }
+
+        // Re-encrypt only when the entry actually changed.
         (entry.TitleEncrypted,   entry.TitleNonce)   = EncryptField(req.Title,   masterKey);
         (entry.ContentEncrypted, entry.ContentNonce) = EncryptField(req.Content, masterKey);
 
@@ -113,9 +127,8 @@ public sealed class EntryService(IDbContextFactory<ArcaneDbContext> dbFactory, I
 
         if (req.TagIds.Count > 0)
         {
-            var tagIds = req.TagIds.ToHashSet();
             var tags   = await db.Tags
-                .Where(t => tagIds.Contains(t.Id))
+                .Where(t => requestedTagIds.Contains(t.Id))
                 .ToListAsync();
 
             entry.EntryTags = tags.Select(t => new EntryTag

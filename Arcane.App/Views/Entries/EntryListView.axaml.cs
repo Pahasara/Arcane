@@ -2,7 +2,6 @@ using System;
 using Arcane.App.Controls;
 using Arcane.App.ViewModels.Entries;
 using Arcane.Core.Models.Entities;
-using Arcane.Core.Models.Enums;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 
@@ -29,13 +28,4 @@ public partial class EntryListView : UserControl
             vm.ToggleTagFilterCommand.Execute(tag);
     }
 
-    /// <summary>Mood filter buttons use the standard Button.Click — parse Tag string back to enum.</summary>
-    private void OnMoodFilterClicked(object? sender, RoutedEventArgs e)
-    {
-        if (sender is not Button { Tag: string moodName }) return;
-        if (DataContext is not EntryListViewModel vm) return;
-
-        if (Enum.TryParse<MoodLevel>(moodName, out var mood))
-            vm.ToggleMoodFilterCommand.Execute(mood);
-    }
 }

@@ -15,6 +15,8 @@ namespace Arcane.App.ViewModels.Tags;
 /// </summary>
 public partial class TagManagerViewModel(ITagService tagService) : ViewModelBase
 {
+    public Action? CloseRequested;
+    public Func<Task>? TagsChanged;
     /// <summary>12 preset pastel colors shown as swatches when creating a tag.</summary>
     public static readonly string[] ColorPresets =
     [
@@ -69,6 +71,8 @@ public partial class TagManagerViewModel(ITagService tagService) : ViewModelBase
         {
             var tag = await tagService.CreateAsync(NewTagName, NewTagColor);
             Tags.Add(tag);
+            if (TagsChanged is not null)
+                await TagsChanged();
 
             // Reset the input row
             NewTagName  = string.Empty;
@@ -100,6 +104,8 @@ public partial class TagManagerViewModel(ITagService tagService) : ViewModelBase
         try
         {
             await tagService.RenameAsync(EditingTag.Id, EditingName);
+            if (TagsChanged is not null)
+                await TagsChanged();
 
             // Update the in-memory copy so the UI reflects the change immediately
             var index = Tags.IndexOf(EditingTag);
@@ -138,10 +144,14 @@ public partial class TagManagerViewModel(ITagService tagService) : ViewModelBase
         {
             await tagService.DeleteAsync(tag.Id);
             Tags.Remove(tag);
+            if (TagsChanged is not null)
+                await TagsChanged();
         }
         catch (Exception ex)
         {
             ErrorMessage = ex.Message;
         }
+
     }
+
 }

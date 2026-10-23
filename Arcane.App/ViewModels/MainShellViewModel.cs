@@ -29,6 +29,7 @@ public partial class MainShellViewModel : ViewModelBase
 
     /// <summary>Sidebar entry list — always visible. Bound in MainShellView.axaml.</summary>
     public EntryListViewModel EntryList { get; }
+    public Action<TagManagerViewModel>? TagManagerRequested;
 
     /// <summary>
     /// Currently open editor. null = empty state.
@@ -64,11 +65,16 @@ public partial class MainShellViewModel : ViewModelBase
     // Open existing entry
     private async Task OpenEntryAsync(Guid entryId)
     {
-        CurrentEditor?.Dispose(); // stop previous auto-save timer
+        if (CurrentEditor is not null)
+        {
+            await CurrentEditor.SavePendingAsync();
+            CurrentEditor.Dispose();
+        }
 
         var editor = _services.GetRequiredService<EntryEditorViewModel>();
         editor.OnEntrySaved   = OnEntrySaved;
         editor.OnEntryDeleted = OnEntryDeleted;
+        editor.OpenTagManagerRequested = OpenTagManager;
 
         CurrentEditor = editor;
         await editor.LoadAsync(entryId);
@@ -107,13 +113,28 @@ public partial class MainShellViewModel : ViewModelBase
 
     // Lock
     [RelayCommand]
-    private void Lock()
+    private async Task Lock()
     {
+        if (CurrentEditor is not null)
+            await CurrentEditor.SavePendingAsync();
+
         CurrentEditor?.Dispose();
         CurrentEditor = null;
         _vault.Lock();
     }
     
     [RelayCommand]
-    private void OpenTagManager() => _navigation.NavigateTo<TagManagerViewModel>();
+    private void OpenTagManager()
+    {
+        var viewModel = _services.GetRequiredService<TagManagerViewModel>();
+        viewModel.TagsChanged = RefreshTagsAsync;
+        TagManagerRequested?.Invoke(viewModel);
+    }
+
+    private async Task RefreshTagsAsync()
+    {
+        await EntryList.RefreshTagsAsync();
+        if (CurrentEditor is not null)
+            await CurrentEditor.RefreshTagsAsync();
+    }
 }
